@@ -190,9 +190,9 @@ let _statsCache = null, _anyReleasedCache = false;
 function _runtimeFrom4() { return runtime; }
 function _resolveDay() { return runtime.globalVars.DayTotal; }
 function _rt42() { return runtime; }
-function _getArray18(n) { return arrays[n]; }
+function _getArray20(n) { return arrays[n]; }
 function _dims4(a) { return [a.width, a.height, a.depth]; }
-function _num23(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
+function _num25(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
 function _at42(a, x, y, z) { return a.getAt(x, y, z); }
 function _resolveInst(rt, n) { return arrays[n]; }
 function _resolveLicInst() { return null; }

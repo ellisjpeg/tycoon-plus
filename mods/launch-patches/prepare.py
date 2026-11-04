@@ -48,8 +48,8 @@ REVIEWS_REQUIRED = (
 HELPER_PATCHES = (
     ('if(o<=0||a<=0||s<=Z19.RELEASE)return 0;let r=0;',
      'if(o<=0||a<=0||s<=Z19.RELEASE)return 0;const _dtDay=_resolveDay(void 0,_runtimeFrom4());let r=0;'),
-    ('-1!==a&&(_num23(_at42(n,e,o,Z19.RELEASE),-1)<0||(r++,',
-     '-1!==a&&(_num23(_at42(n,e,o,Z19.RELEASE),-1)<0||_num23(_at42(n,e,o,Z19.RELEASE),-1)>_dtDay||(r++,'),
+    ('-1!==a&&(_num25(_at42(n,e,o,Z19.RELEASE),-1)<0||(r++,',
+     '-1!==a&&(_num25(_at42(n,e,o,Z19.RELEASE),-1)<0||_num25(_at42(n,e,o,Z19.RELEASE),-1)>_dtDay||(r++,'),
     ('function getReleasedDeviceStats(e){const t=_runtimeFrom4(e);if(!t)return null;const n=_resolveDay(void 0,t);',
      'function getReleasedDeviceStats(e){const t=_runtimeFrom4(e);if(!t)return null;const n=_resolveDay(void 0,t);const _dtDay=n;'),
     ('const a=d.getAt(e,t,Z13.RELEASE);if(!(a>=0))continue;',
