@@ -188,6 +188,17 @@ test("Careful: smaller orders, never below the cash line, never into debt", () =
   assert.equal(run(debtC, 3, 0, 0), 0, "Careful waits");
   assert.ok(b0 > 0);
 });
+test("restock fees land in the game's finance ledger (game update 1.6), so its money stats add up", () => {
+  for (const mode of ["auto", "careful"]) {
+    const w = world(), book = {};
+    w.ctx.financeRecord = (k, v) => (book[k] = (book[k] || 0) + v);
+    w.api.setModel("ArraySmartphones", w.phones, 0, mode);
+    const b0 = w.gv.Budget, made = run(w, 20, 0, 0);
+    assert.ok(made > 0, mode + ": restocked");
+    assert.ok(book.production < 0, mode + ": restock spend booked as Production");
+    assert.equal(Math.round(book.sales + book.production), Math.round(w.gv.Budget - b0), mode + ": nothing left for 'Other'");
+  }
+});
 test("Off: sells out and stays sold out; the game's sold-out message still comes", () => {
   const w = world();
   w.api.setModel("ArraySmartphones", w.phones, 0, "off");

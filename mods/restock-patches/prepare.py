@@ -16,19 +16,22 @@ HERE = Path(__file__).resolve().parent
 UI = HERE.parent / 'mods-ui/ui.js'
 REQUIRED_JS = (
     'var Z13={CREATED:0,SOLDED:1,POP:2,COST:3,SELL:4,RATING:5,HYPE:6,RELEASE:7,NAME:8}',
-    'EventGameplay_Event448_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
+    'EventGameplay_Event449_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
     'function tickDeviceSales(e,t){',
     # The call by name and its argument order: (runtime, array, x, y, day, made, POP, rating, price, cfg, state, slot key, ...).
-    '!w&&Y>0&&V-H<=H&&(m.earned=d,m.slotSold=H,_handleBatchSoldOut(n,g,b,x,o,N,T,O,M,a,m,k,U,W,B))',
-    'function _handleBatchSoldOut(e,t,n,o,a,s,r,i,l,c,d,p,u,_,m){',
-    'const m={contractEnd:void 0,earned:0,restockCost:0,contractFee:0,soldedNotified:!1}',
+    '!w&&Y>0&&V-H<=H&&(g.earned=d,g.slotSold=H,_handleBatchSoldOut(n,m,b,x,o,N,T,O,M,a,g,k,U,W,B))',
+    'function _handleBatchSoldOut(e,t,n,o,a,s,r,i,l,c,d,p,u,_,g){',
+    'const g={contractEnd:void 0,earned:0,restockCost:0,contractFee:0,soldedNotified:!1}',
+    # Restock fees are the game's own restockCost, which tickDeviceSales books as Production in the
+    # game's finance ledger (game update 1.6), so the game's money stats include them.
+    'globalThis.financeRecord?.("production",-Math.round(g.restockCost)-Math.round(g.contractFee))',
     'C=r?_slotKey(r.name,e,n,l):null',
     'return e+":id"+a}}catch(e){}return e+":"+n+":"+o}',
     # Off: POP under the minimum skips the order but keeps the sold-out message.
     'if((b||y)&&r>=c.RESTOCK_MIN_POP){',
     'return G(),!1}}}return G(),!1}',
     # Careful: the order size and money cap come only from these settings.
-    'n=y?c.RESTOCK_SELF_PCT:c.RESTOCK_MAX_PCT;a=Math.floor(g*n*e*t);const o=Math.ceil((_||0)*c.RESTOCK_COVER_DAYS)',
+    'n=y?c.RESTOCK_SELF_PCT:c.RESTOCK_MAX_PCT;a=Math.floor(m*n*e*t);const o=Math.ceil((_||0)*c.RESTOCK_COVER_DAYS)',
     'a=Math.ceil(e*c.RESTOCK_TAIL_COVER)',
     'S=l*c.RESTOCK_BUDGET_PCT-d.restockCost;let w=Math.min(b,S),v=!1;if(c.RESTOCK_NEG_DEBT){',
     'else if(l<0&&c.RESTOCK_NEG_REINVEST>0){',
@@ -38,7 +41,7 @@ REQUIRED_JS = (
     'RESTOCK_MAX_PCT:.25',
     'RESTOCK_MIN_POP:3',
     # Wages for the Careful cash line.
-    'function estimateSalaryNow(e){const t=_scanPayroll(_rt9(e));return{total:t.total,',
+    'function estimateSalaryNow(e){const t=_scanPayroll(_rt10(e));return{total:t.total,',
 )
 # Mod hooks, needed only when that mod is in the build.
 SELL_HOOKS = ('var _dtSell = {', 'function _dtSellTick() {', 'function _dtSellView() {', 'function _dtSellRowSpecs(v, state) {',

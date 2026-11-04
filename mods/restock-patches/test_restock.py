@@ -41,9 +41,10 @@ class RestockTests(unittest.TestCase):
 
     def test_game_restock_checked(self):
         # The call by name, its arguments, the POP gate and the settings Careful changes.
-        for old in ('_handleBatchSoldOut(n,g,b,x,o,N,T,O,M,a,m,k,U,W,B)', 'if((b||y)&&r>=c.RESTOCK_MIN_POP){',
+        for old in ('_handleBatchSoldOut(n,m,b,x,o,N,T,O,M,a,g,k,U,W,B)', 'if((b||y)&&r>=c.RESTOCK_MIN_POP){',
                     'S=l*c.RESTOCK_BUDGET_PCT-d.restockCost', 'a=Math.ceil(e*c.RESTOCK_TAIL_COVER)',
-                    'RESTOCK_SELF_PCT:.12', 'function estimateSalaryNow(e)'):
+                    'RESTOCK_SELF_PCT:.12', 'function estimateSalaryNow(e)',
+                    'globalThis.financeRecord?.("production",-Math.round(g.restockCost)'):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source.replace(old, old[:-2] + '#!'))
 
