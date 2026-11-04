@@ -36,7 +36,7 @@ REQUIRED_JS = (
     'var _yearOfDay3=e=>ANCHOR_FIRST_YEAR+Math.floor(Math.max(0,e-1)/365)',
     'function _today(e){',
     'TABLES={SMARTPHONE:{items:SMARTPHONE_ITEMS',
-    'const o=String(t??_gv19(e,"DeviceType","SMARTPHONE")).toUpperCase(),a=TABLES[o],s=void 0===n?_today(e):n,r=_yearOfDay3(s),i=a&&a.anchor?a.anchor:ANCHOR,l=e=>_anchorAt(i,e),c=a&&Number.isFinite(a.K)?a.K:_cfg12.K,d=l(r)',
+    'const o=String(t??_gv21(e,"DeviceType","SMARTPHONE")).toUpperCase(),a=TABLES[o],s=void 0===n?_today(e):n,r=_yearOfDay3(s),i=a&&a.anchor?a.anchor:ANCHOR,l=e=>_anchorAt(i,e),c=a&&Number.isFinite(a.K)?a.K:_cfg12.K,d=l(r)',
 )
 REQUIRED_DATA = ('"ArraySaves"', '"SaveSlot"', '"CompanyName"', '"DeviceTypeCreatingNow"', '"DeviceType"', '"DeviceName"',
                  '"DevicePrice"', '"DeviceCostPrice"', '"EDITOR PRICE PAGE"', '"DayTotal"')

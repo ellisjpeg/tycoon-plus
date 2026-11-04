@@ -33,9 +33,9 @@ class FairPriceTests(unittest.TestCase):
         cls.editor = patch.editor_map(cls.data, cls.source)
 
     def test_markup_expression_is_only_the_review_price_checks(self):
-        # E20619 in the event dump: 10 engines x 8 tests in 282 REVIEWS, nowhere else.
+        # E20626 in the event dump (E20619 before game update 1.6): 10 engines x 8 tests in 282 REVIEWS, nowhere else.
         idx = patch.check_uses(self.data, self.source)
-        self.assertEqual(idx, 20619)
+        self.assertEqual(idx, 20626)
         self.assertEqual(self.editor['SMARTPHONE'], 'SMARTPHONES')
         self.assertEqual(self.editor['VR'], 'VR CONSOLE')
         self.assertEqual(len(self.editor), 10)
