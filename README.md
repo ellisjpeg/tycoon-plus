@@ -1,10 +1,12 @@
+![Tycoon+](docs/images/banner.png)
+
 # Tycoon+ for Devices Tycoon
 
 **An unofficial, free mod for [Devices Tycoon](https://store.steampowered.com/app/2085660/Devices_Tycoon/) that adds the stuff I kept wishing the game had.**
 
 Queue up your next phone while the current one is still being built. Pick your own launch day. Watch rival companies launch their devices. Compare two of your designs side by side. Set the difficulty the way you like it. And a pile of smaller fixes that make a long save feel a lot smoother.
 
-![Comparing two phones side by side](docs/images/compare.png)
+![Build queue with four devices waiting](docs/images/build-queue.png)
 
 > Tycoon+ is a fan project. It isn't made, endorsed or supported by Roastery Games or Valve. If something breaks while it's installed, please [report it here](../../issues), not to Roastery.
 
@@ -42,9 +44,10 @@ Queue up your next phone while the current one is still being built. Pick your o
 
 Everything works in English and Russian, like the game.
 
-| ![Difficulty sliders](docs/images/difficulty.png) | ![Hiring in bulk](docs/images/bulk-hire.png) |
+| ![Sales board](docs/images/sales-board.png) | ![Planning a launch event](docs/images/launch-event.png) |
 |---|---|
-| ![Sales board](docs/images/sales-board.png) | ![Year in review](docs/images/year-in-review.png) |
+
+![Comparing two phones side by side](docs/images/compare.png)
 
 ---
 
