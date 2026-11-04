@@ -30,7 +30,6 @@ INPUT_DATA = GAME_FILES / "data.json"
 #     fn(source, map_json)               with needs_template_map
 # Later mods hook code that earlier ones add, so keep this order.
 PATCH_STEPS = [
-    ("DEVICES_TYCOON_ASSISTANT", "mods/assistant-patches/prepare.py", "data.json", "transform", {}),
     ("DEVICES_TYCOON_TEMPLATE", "mods/template-patches/prepare.py", "c3main.js",
      "transform", {"needs_template_map": True}),
     ("DEVICES_TYCOON_SPEED", "mods/speed-patches/prepare.py", "c3main.js", "transform", {}),
@@ -90,8 +89,6 @@ def apply_steps(sources: dict[str, str]) -> dict[str, str]:
             sources[target] = fn(before, module.build_map(str(INPUT_DATA), str(INPUT_C3MAIN)))
         else:
             sources[target] = fn(before)
-        if sources[target] is before and target == "data.json":
-            print(f"{flag}: fixed upstream (unchanged)")
         print(f"applied {flag} -> {target}")
     return sources
 
