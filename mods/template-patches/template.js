@@ -6,6 +6,10 @@
 // back to the next one up (else the closest one below) and is reported.
 // The device arrays and the save are never written; any failure restores
 // the editor state captured just before the copy.
+// Since game update 1.6 the name screen also has the game's own "Copy the design
+// of a past model" (looks only). This copy leaves the looks alone (_dtTplLooks), so
+// the two work together in either order: specs and parts from one model, looks
+// from another.
 // Devices waiting in the build queue (queue patch, _dtQueueApi.templates) are listed
 // too, as "Queued: <name>". Their stored values are what AddToArray would
 // write, so they are read through the same cells as a saved row.
@@ -42,9 +46,9 @@ var _DT_TPL_PICK = { hue: [117, 523], sx: [523, 117], vy: [505, 175], off: { LAP
 var _DT_TPL_NUM_MARK = -987654.25;
 var _DT_TPL_STR_MARK = "\u0001dt-tpl";
 var _DT_TPL_TEXT = {
-  label: { en: "Start from", ru: "Основа" },
-  fresh: { en: "New design", ru: "Новый дизайн" },
-  copied: { en: "Copied from {n}.", ru: "Скопировано с {n}." },
+  label: { en: "Start from a past model's specs", ru: "Взять характеристики прошлой модели" },
+  fresh: { en: "Don't copy", ru: "Не копировать" },
+  copied: { en: "Specs and parts copied from {n}.", ru: "Характеристики и детали скопированы с {n}." },
   swapOne: { en: "1 part is no longer sold, so the closest available one was used: {l}.", ru: "1 деталь больше не продаётся, выбрана ближайшая доступная: {l}." },
   swapMany: { en: "{c} parts are no longer sold, so the closest available ones were used: {l}.", ru: "Деталей больше не продаётся: {c}. Выбраны ближайшие доступные: {l}." },
   adjusted: { en: "Adjusted to fit: {l}.", ru: "Подогнано: {l}." },
@@ -52,7 +56,7 @@ var _DT_TPL_TEXT = {
   headphones: { en: "Bundled headphones were not copied.", ru: "Наушники в комплекте не скопированы." },
   gamepad: { en: "Check the gamepad choice.", ru: "Проверьте выбор геймпада." },
   more: { en: "{l} and {c} more", ru: "{l} и ещё {c}" },
-  reset: { en: "Back to a new design.", ru: "Снова новый дизайн." },
+  reset: { en: "Specs and parts are back to how they were.", ru: "Характеристики и детали возвращены как были." },
   failed: { en: "Could not copy {n}. Nothing was changed.", ru: "Не удалось скопировать {n}. Ничего не изменено." },
   version: { en: "{n} ({t})", ru: "{n} ({t})" },
   inQueue: { en: "In the build queue", ru: "В очереди на производство" },
@@ -235,7 +239,7 @@ function _dtTplQueued(cat) {
       key: q.key,
       name: q.name,
       // Listed under "In the build queue", so the name alone (the queue's own label says "Queued: ...").
-      label: q.count > 1 ? _dtTplT("version", { n: q.name, t: _t24(tier.textKey) }) : q.name,
+      label: q.count > 1 ? _dtTplT("version", { n: q.name, t: _t29(tier.textKey) }) : q.name,
       queued: true,
       src: { cell, lost: q.lost || [] },
     };
@@ -270,7 +274,7 @@ function _dtTplRows(cat) {
         x,
         y: f.y,
         name: f.name,
-        label: found.length > 1 ? _dtTplT("version", { n: f.name, t: _t24(tier.textKey) }) : f.name,
+        label: found.length > 1 ? _dtTplT("version", { n: f.name, t: _t29(tier.textKey) }) : f.name,
       });
     }
   }
@@ -486,7 +490,7 @@ function _dtTplList(ids) {
 }
 // Copies saved row (x, y), or a queued device when `src` is given.
 function _dtTplApply(cat, x, y, src) {
-  const rt = _rt63(), M = _DT_TPL_MAP[cat], R = _RESTORE_MAP[cat], D = _DESIGN_MAP[cat];
+  const rt = globalThis.runtime || null, M = _DT_TPL_MAP[cat], R = _RESTORE_MAP[cat], D = _DESIGN_MAP[cat];
   const a = _getArray24(R.arr);
   if (!rt || !rt.globalVars || !(a || src) || !M) return { ok: !1 };
   const cell = src ? src.cell : (z) => a.getAt(x, y, z);
@@ -606,10 +610,57 @@ function _dtTplMessage(name, r) {
   r.gamepad && parts.push(_dtTplT("gamepad"));
   return parts.join(" ");
 }
+// Looks (as the game's own look copy defines them) before a change here, and a
+// function that puts them back afterwards. null where the game has no look copy.
+function _dtTplLooks() {
+  let L = null;
+  try {
+    L = _lookSpec();
+  } catch (e) {}
+  if (!L) return null;
+  const cap = _captureLook(L), rows = [];
+  const d = "design" === L.mode ? _getArray24(L.design) : null;
+  // The design array also holds non-look cells (camera, specs): keep only the look rows.
+  if (d) {
+    const h = 0 | _arrSize3(d)[1];
+    for (const n of L.rows) n < h && rows.push([n, d.getAt(0, n)]);
+  }
+  "design" === L.mode && delete cap.arrays[L.design];
+  return () => {
+    for (const [k, v] of Object.entries(cap.gv)) _setGvTyped(k, v);
+    for (const [n, j] of Object.entries(cap.arrays)) _loadArrayFromJson(n, j);
+    const a = d && _getArray24(L.design);
+    if (a) {
+      const h = 0 | _arrSize3(a)[1];
+      for (const [n, v] of rows) n < h && a.setAt(v, 0, n);
+      // The game's Undo puts back the whole design array it saved; give it this
+      // copy's non-look cells so undoing the looks keeps the copied specs.
+      const b = _lookBackup && _lookBackup.arrays;
+      if (b && b[L.design]) {
+        try {
+          const o = JSON.parse(b[L.design]);
+          for (let n = 0; n < h; n++) L.rows.has(n) || !o.data[0] || !o.data[0][n] || (o.data[0][n][0] = a.getAt(0, n));
+          b[L.design] = JSON.stringify(o);
+        } catch (e) {}
+      }
+    }
+    try {
+      _recalcPrice(L);
+    } catch (e) {}
+  };
+}
 function _dtTplChoose(sel, note, cat) {
+  if (_busy2) return void (sel.value = _dtTplSlot(cat).choice);
+  if (sel.value === _dtTplSlot(cat).choice) return;
+  const looks = _dtTplLooks();
+  try {
+    _dtTplChoose2(sel, note, cat);
+  } finally {
+    looks && looks();
+  }
+}
+function _dtTplChoose2(sel, note, cat) {
   const slot = _dtTplSlot(cat), v = sel.value;
-  if (_busy2) return void (sel.value = slot.choice);
-  if (v === slot.choice) return;
   const show = (s) => {
     slot.note = s;
     note.textContent = s;
@@ -679,7 +730,11 @@ function _dtTplForget(cat, rows) {
   if (!slot.choice) return false;
   const cur = rows.find((r) => r.key === slot.choice);
   if (cur && cur.name === slot.name) return false;
-  slot.base && _dtTplRestore(cat, slot.base);
+  if (slot.base) {
+    const looks = _dtTplLooks();
+    _dtTplRestore(cat, slot.base);
+    looks && looks();
+  }
   slot.choice = "";
   slot.name = "";
   slot.note = slot.base ? _dtTplT("reset") : "";

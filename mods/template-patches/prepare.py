@@ -9,17 +9,20 @@ import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-MOUNT_OLD = 'u.textContent=_t24("nameHint");'
-MOUNT_NEW = 'u.textContent=_t24("nameHint");try{n||_dtTplMount(i,u)}catch(_dtTplErr){}'
+# After the game's own "Copy the design of a past model" row (game update 1.6).
+MOUNT_OLD = '_renderLookRow(_el8("div","dn-look",i),e)}'
+MOUNT_NEW = '_renderLookRow(_el8("div","dn-look",i),e)}try{n||_dtTplMount(i,u)}catch(_dtTplErr){}'
 RESET_OLD = '_markBatchStart(),_runEditorReset();else{'
 RESET_NEW = '_markBatchStart(),_runEditorReset(),_dtTplReset();else{'
 PLACEHOLDER = '__DT_TPL_MAP__'
 # Helpers in the game's name screen that template.js relies on.
 REQUIRED = (
-    'function _rt63(', 'function _getArray24(', 'function _setGvTyped(', 'function _loadArrayFromJson(',
+    'function _getArray24(', 'function _setGvTyped(', 'function _loadArrayFromJson(',
     'function _designCells(', 'function _arrSize3(', 'function _snapshotEditorState(', 'function _applyEditorState(',
-    'function _t24(', 'function _isRu2(', 'function _el8(', 'function _deviceKey2(', 'function _creatingNow(',
+    'function _t29(', 'function _isRu2(', 'function _el8(', 'function _deviceKey2(', 'function _creatingNow(',
     'function _batchPushed(', '_TIERS=', '_RESTORE_MAP=', '_DESIGN_MAP=', '_SNAP_DENY=', '_busy2=',
+    # The game's own look copy, whose looks a copy here leaves alone.
+    'function _lookSpec(', 'function _captureLook(', 'function _recalcPrice(', '_lookBackup=',
 )
 
 
@@ -51,7 +54,7 @@ def transform(source, map_json):
     if '_dtTpl' in source:
         raise ValueError('Template patch already applied')
     if source.count(MOUNT_OLD) != 1:
-        raise ValueError('Expected exactly one name hint line')
+        raise ValueError('Expected exactly one look row on the name screen')
     if source.count(RESET_OLD) != 1:
         raise ValueError('Expected exactly one batch start reset')
     missing = [r for r in REQUIRED if r not in source]

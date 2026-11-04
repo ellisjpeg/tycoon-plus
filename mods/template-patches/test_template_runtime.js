@@ -21,6 +21,8 @@ class Arr {
   getAt(x, y) {
     const r = this.rows[x];
     return r && y < r.length ? r[y] : 0;
+  }  setAt(v, x, y) {
+    (this.rows[x] || (this.rows[x] = []))[y] = v;
   }
 }
 class Arr3 {
@@ -157,7 +159,9 @@ function context(w) {
       },
     },
     _SNAP_DENY: new Set(["Money"]),
-    _rt63: () => w.rt,
+    get runtime() {
+      return w.rt;
+    },
     _getArray24(n) {
       const o = w.rt.objects[n];
       const a = o && o.getFirstInstance();
@@ -192,11 +196,14 @@ function context(w) {
       for (const [k, v] of Object.entries(s.arrays || {})) ctx._loadArrayFromJson(k, v);
       return { ok: true };
     },
-    _t24: (k) => ({ tierBudget: "Budget", tierStandard: "Standard", tierFlagship: "Flagship" })[k] || k,
+    _t29: (k) => ({ tierBudget: "Budget", tierStandard: "Standard", tierFlagship: "Flagship" })[k] || k,
     _isRu2: () => false,
     _deviceKey2: () => "SMARTPHONE",
     _creatingNow: () => 1,
     _batchPushed: () => ctx._pushed,
+    // No look copy unless a test adds one (the game's own, game update 1.6).
+    _lookSpec: () => null,
+    _lookBackup: null,
   };
   vm.createContext(ctx);
   const src = fs.readFileSync(process.argv[2], "utf8").replace("__DT_TPL_MAP__", JSON.stringify(MAP));
@@ -236,7 +243,7 @@ const design = JSON.stringify({ data: [[[7], [8], [9]]] });
   eq(r.adjusted, []);
   eq(r.missing, []);
   const msg = c._dtTplMessage("Phone A", r);
-  assert.equal(msg, "Copied from Phone A. 1 part is no longer sold, so the closest available one was used: RAM.");
+  assert.equal(msg, "Specs and parts copied from Phone A. 1 part is no longer sold, so the closest available one was used: RAM.");
   assert.ok(!/—/.test(msg), "no em dashes in copy");
 }
 
@@ -251,7 +258,7 @@ const design = JSON.stringify({ data: [[[7], [8], [9]]] });
   assert.equal(w.gv.OperationSystemID, 100);
   eq(r.swapped, ["RAM_ID"]);
   assert.equal(c._dtTplMessage("Phone B", r),
-    "Copied from Phone B. 1 part is no longer sold, so the closest available one was used: RAM.");
+    "Specs and parts copied from Phone B. 1 part is no longer sold, so the closest available one was used: RAM.");
 }
 
 // 3. Own OS is only chosen when the company actually has one.
@@ -288,7 +295,7 @@ for (const fail of ["throw", "async"]) {
   assert.equal(JSON.stringify(w.arrays.ArrayDesign_Choosen.rows), arr, fail + ": arrays restored");
 }
 
-// 5. Choosing, switching and going back to "New design" only reverts what a
+// 5. Choosing, switching and going back to "Don't copy" only reverts what a
 // copy can touch; unrelated progress made meanwhile is kept.
 {
   const w = world(), c = context(w);
@@ -298,7 +305,7 @@ for (const fail of ["throw", "async"]) {
   const sel = { value: "0:0" }, note = {};
   c._dtTplChoose(sel, note, "SMARTPHONE");
   assert.equal(w.gv.Thickness, 4);
-  assert.equal(note.textContent, "Copied from Phone E.");
+  assert.equal(note.textContent, "Specs and parts copied from Phone E.");
   w.gv.Money = 1234;
   sel.value = "1:0";
   c._dtTplChoose(sel, note, "SMARTPHONE");
@@ -306,7 +313,7 @@ for (const fail of ["throw", "async"]) {
   assert.equal(w.gv.OperationSystemID, 202);
   sel.value = "";
   c._dtTplChoose(sel, note, "SMARTPHONE");
-  assert.equal(note.textContent, "Back to a new design.");
+  assert.equal(note.textContent, "Specs and parts are back to how they were.");
   for (const k of ["RAM", "RAM_ID", "RAMType", "RAMTypeID", "Thickness", "OperationSystem", "OperationSystemVersion", "OperationSystemID", "MiniPage", "Graphic2D"])
     assert.equal(w.gv[k], start[k], k + " back to the new-design value");
   assert.equal(w.gv.Money, 1234, "unrelated state not rolled back");
@@ -317,7 +324,7 @@ for (const fail of ["throw", "async"]) {
   assert.equal(sel.value, "");
   assert.equal(w.gv.Thickness, start.Thickness);
   c._busy2 = false;
-  // A failed copy reports it and leaves the select on New design.
+  // A failed copy reports it and leaves the select on Don't copy.
   w.fns.Page6 = () => { throw new Error("boom"); };
   const warn = console.warn;
   console.warn = () => {};
@@ -367,7 +374,7 @@ for (const fail of ["throw", "async"]) {
   assert.deepEqual(w.arrays.ArrayDesign_Choosen.rows[0], cells, "design array loaded");
   const touch = c._dtTplTouch("SMARTPHONE");
   for (let i = 1; i <= 5; i++)
-    for (const ch of ["Red", "Green", "Blue"]) assert.ok(touch.has(ch + i), ch + i + " is restored on New design");
+    for (const ch of ["Red", "Green", "Blue"]) assert.ok(touch.has(ch + i), ch + i + " is restored on Don't copy");
   for (let i = 0; i < 5; i++) {
     assert.equal(w.gv["Red" + (i + 1)], palette[i][0], "palette red " + (i + 1));
     assert.equal(w.gv["Green" + (i + 1)], palette[i][1], "palette green " + (i + 1));
@@ -383,10 +390,10 @@ for (const fail of ["throw", "async"]) {
   const r = c._dtTplApply("SMARTPHONE", 0, 0);
   assert.equal(r.ok, true);
   assert.equal(c._dtTplMessage("Телефон", r),
-    "Скопировано с Телефон. 1 деталь больше не продаётся, выбрана ближайшая доступная: Оперативная память.");
+    "Характеристики и детали скопированы с Телефон. 1 деталь больше не продаётся, выбрана ближайшая доступная: Оперативная память.");
   assert.equal(c._dtTplMessage("Телефон", { swapped: [], adjusted: ["OperationSystemID"],
     missing: ["ProcessorID"], headphones: false, gamepad: false }),
-    "Скопировано с Телефон. Подогнано: Операционная система. Недоступно: Процессор.");
+    "Характеристики и детали скопированы с Телефон. Подогнано: Операционная система. Недоступно: Процессор.");
 }
 
 // 10. Several replacements use plural, direction-neutral wording.
@@ -398,7 +405,7 @@ for (const fail of ["throw", "async"]) {
   eq(r.swapped, ["RAM_ID", "OperationSystemID"]);
   const msg = c._dtTplMessage("Phone H", r);
   assert.equal(msg,
-    "Copied from Phone H. 2 parts are no longer sold, so the closest available ones were used: RAM, Operation System.");
+    "Specs and parts copied from Phone H. 2 parts are no longer sold, so the closest available ones were used: RAM, Operation System.");
   assert.ok(!/next one up/.test(msg), "no wrong direction");
 }
 // 10b. A picked template that disappears (or is renamed) before the name screen is shown
@@ -416,7 +423,7 @@ for (const fail of ["throw", "async"]) {
   eq(JSON.parse(JSON.stringify(w.gv)), start, "editor back to the design it began with");
   const slot = c._dtTplSlot("SMARTPHONE");
   assert.equal(slot.choice, "");
-  assert.equal(slot.note, "Back to a new design.");
+  assert.equal(slot.note, "Specs and parts are back to how they were.");
 }
 // 11. Queued devices (queue patch hook): listed first by name (in the "In the build queue" group), and
 // copying one gives the same editor as copying the device it would make.
@@ -442,7 +449,7 @@ for (const fail of ["throw", "async"]) {
   eq(c2._dtTplRows("SMARTPHONE").map((r) => !!r.queued), [true, false]);
   const sel = { value: "q:e1:0" }, n2 = {};
   c2._dtTplChoose(sel, n2, "SMARTPHONE");
-  assert.equal(n2.textContent, "Copied from Phone Q.");
+  assert.equal(n2.textContent, "Specs and parts copied from Phone Q.");
   eq(w2.gv, JSON.parse(JSON.stringify(w1.gv)), "same editor values as the made device");
   eq(w2.arrays.ArrayDesign_Choosen.rows, [[55, 1, 9]]);
   assert.equal(w2.gv.SmartphoneWidth, 55, "design cells from the stored design array");
@@ -451,7 +458,7 @@ for (const fail of ["throw", "async"]) {
   assert.equal(w2.gv.DevicePrice, 0, "price never copied");
   assert.ok(!("Extra" in w2.gv), "only the device's own fields");
   // The entry is removed (or replayed) later: the editor keeps its values and
-  // New design still goes back.
+  // Don't copy still goes back.
   c2._dtQueueApi.templates = () => [];
   const kept = JSON.stringify(w2.gv);
   eq(c2._dtTplRows("SMARTPHONE").map((r) => r.key), ["0:0"]);
@@ -481,7 +488,7 @@ for (const fail of ["throw", "async"]) {
   const note = {};
   c._dtTplChoose({ value: "q:d:1" }, note, "SMARTPHONE");
   assert.equal(w.gv.Thickness, 2);
-  assert.equal(note.textContent, "Copied from Duo 2 (Standard). Not available: Processor.");
+  assert.equal(note.textContent, "Specs and parts copied from Duo 2 (Standard). Not available: Processor.");
 }
 
 // 13. Extra side buttons: several design cells feed one type global. No
@@ -545,7 +552,7 @@ for (const fail of ["throw", "async"]) {
     design: JSON.stringify({ data: [cells.map((v) => [v])] }) });
   const sel = { value: "0:0" }, note = {};
   c._dtTplChoose(sel, note, "SMARTPHONE");
-  assert.equal(note.textContent, "Copied from White Phone.");
+  assert.equal(note.textContent, "Specs and parts copied from White Phone.");
   for (let i = 1; i <= 5; i++) {
     eq([w.gv["Red" + i], w.gv["Green" + i], w.gv["Blue" + i]], palette[i - 1], "palette " + i + " copied");
     eq(chooseColor(w.gv, 0, i, [0, 0, 0]), palette[i - 1], "colour page keeps palette " + i);
@@ -559,14 +566,50 @@ for (const fail of ["throw", "async"]) {
       Object.assign(g, c._dtTplPickerFor((n) => g[n], cat, 1));
       eq(chooseColor(g, off, 1, [0, 0, 0]), rgb, cat + " colour page keeps " + rgb);
     }
-  // "New design" puts the pickers back with the colours.
+  // "Don't copy" puts the pickers back with the colours.
   const touch = c._dtTplTouch("SMARTPHONE");
   for (let i = 1; i <= 5; i++)
-    for (const n of ["ColorCanvas" + i + "_X", "ColorCanvas" + i + "_Y", "ColorLine" + i + "_X"]) assert.ok(touch.has(n), n + " is restored on New design");
+    for (const n of ["ColorCanvas" + i + "_X", "ColorCanvas" + i + "_Y", "ColorLine" + i + "_X"]) assert.ok(touch.has(n), n + " is restored on Don't copy");
   sel.value = "";
   c._dtTplChoose(sel, note, "SMARTPHONE");
   const back = JSON.parse(before);
   for (const n of c._dtTplPaletteNames()) assert.equal(w.gv[n], back[n], n + " back to the draft's value");
 }
 
-console.log("template runtime: 14 scenarios passed");
+// 15. The game's own look copy (game update 1.6) owns the looks: a copy here never
+// changes them, going back never undoes them, and the game's Undo keeps the copied specs.
+{
+  const w = world(), c = context(w);
+  const L = { mode: "design", design: "ArrayDesign_Choosen", rows: new Set([0]), price: "PhonePrice" };
+  let priced = 0;
+  c._lookSpec = () => L;
+  c._recalcPrice = (l) => (assert.equal(l, L), priced++);
+  c._captureLook = (l) => ({
+    gv: { SmartphoneWidth: w.gv.SmartphoneWidth },
+    arrays: { [l.design]: JSON.stringify({ data: w.arrays.ArrayDesign_Choosen.rows.map((r) => r.map((v) => [v])) }) },
+  });
+  // The player already took the looks of another model with the game's button.
+  w.arrays.ArrayDesign_Choosen.load([[55, 0, 0]]);
+  w.gv.SmartphoneWidth = 55;
+  c._lookBackup = { gv: { SmartphoneWidth: 50 }, arrays: { ArrayDesign_Choosen: JSON.stringify({ data: [[[50], [0], [0]]] }) } };
+  saveDevice(w, 0, 0, "Phone L", { RAM_ID: 2, RAMTypeID: 11, OperationSystemID: 101, Thickness: 4,
+    design: JSON.stringify({ data: [[[7], [1], [9]]] }) });
+  const start = { ...w.gv };
+  const sel = { value: "0:0" }, note = {};
+  c._dtTplChoose(sel, note, "SMARTPHONE");
+  assert.equal(note.textContent, "Specs and parts copied from Phone L.");
+  assert.equal(w.gv.Thickness, 4, "specs copied");
+  assert.equal(w.gv.RoundedEdges, "ON", "non-look design choices copied");
+  assert.equal(w.gv.SmartphoneWidth, 55, "looks from the game's copy kept");
+  eq(w.arrays.ArrayDesign_Choosen.rows, [[55, 1, 9]], "look rows kept, other design rows copied");
+  eq(JSON.parse(c._lookBackup.arrays.ArrayDesign_Choosen).data, [[[50], [1], [9]]], "game's Undo keeps the copied rows");
+  assert.equal(c._lookBackup.gv.SmartphoneWidth, 50, "game's Undo still goes back to its own looks");
+  assert.ok(priced > 0, "price worked out again like the game's look copy does");
+  sel.value = "";
+  c._dtTplChoose(sel, note, "SMARTPHONE");
+  assert.equal(w.gv.Thickness, start.Thickness, "specs back");
+  assert.equal(w.gv.SmartphoneWidth, 55, "going back leaves the game's looks alone");
+  eq(w.arrays.ArrayDesign_Choosen.rows[0][0], 55);
+}
+
+console.log("template runtime: 15 scenarios passed");

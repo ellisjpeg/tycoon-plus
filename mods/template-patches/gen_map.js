@@ -46,9 +46,12 @@ function load(dataPath, mainPath) {
   }
   // Only the function sources are needed; they are never executed here.
   const exprs = splitTopLevel(src.slice(start + 1, i));
-  const ma = src.indexOf('var _container101=null');
+  // The name screen's own variables start its module (numbered names change between builds).
+  const heads = [...src.matchAll(/var _container\d+=null,_cssInjected\d+=!1,_resizeObs\d+=null,_step\d+="count",_busy\d+=!1/g)];
+  if (heads.length !== 1) throw new Error('device name screen maps not found');
+  const ma = heads[0].index;
   const mb = src.indexOf(';function _langArrayCovers', ma);
-  if (ma < 0 || mb < 0) throw new Error('device name screen maps not found');
+  if (mb < 0 || /\bfunction\b/.test(src.slice(ma, mb))) throw new Error('device name screen maps changed');
   const maps = (new Function(src.slice(ma, mb) + ';return {_DEVICES,_DEVICE_ARRAY,_RESTORE_MAP,_DESIGN_MAP}'))();
   return { project, refs, exprs, maps };
 }
