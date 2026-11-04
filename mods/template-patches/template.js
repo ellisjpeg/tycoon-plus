@@ -690,21 +690,23 @@ function _dtTplChoose2(sel, note, cat) {
     show(_dtTplT("failed", { n: row.label }));
   }
 }
+// Game update 1.6 put its own look row on this panel, so this block stays compact to keep the
+// panel inside the screen: one line of note (the full text is its tooltip), none while empty.
 function _dtTplCss() {
   if (document.getElementById("dt-template-css")) return;
   const s = document.createElement("style");
   s.id = "dt-template-css";
   s.textContent = `
-.dn-tpl { width: 100%; display: flex; flex-direction: column; gap: calc(var(--dn) * 6px); flex: 0 0 auto;
+.dn-tpl { width: 100%; display: flex; flex-direction: column; gap: 0; flex: 0 0 auto;
   animation: dn-field-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.14s backwards; }
 .dn-tpl-row { display: flex; align-items: center; gap: calc(var(--dn) * 14px); width: 100%; }
 .dn-tpl-label { flex: 0 0 auto; font-family: "SofiaSansExtraCondensed-Bold", "Oswald", sans-serif;
   font-size: calc(var(--dn) * 19px); letter-spacing: calc(var(--dn) * 1px); color: rgba(255, 255, 255, 0.72); }
 .dn-tpl-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
 #dn-root .dn-tpl-select { -webkit-appearance: none; appearance: none; display: block; width: 100%; margin: 0;
-  height: calc(var(--dn) * 44px); padding: 0 calc(var(--dn) * 46px) 0 calc(var(--dn) * 18px);
-  border: 0; border-radius: calc(var(--dn) * 14px); outline: 0; cursor: pointer;
-  font-family: "SofiaSansExtraCondensed-Light", "Oswald", sans-serif; font-size: calc(var(--dn) * 21px);
+  height: calc(var(--dn) * 34px); padding: 0 calc(var(--dn) * 46px) 0 calc(var(--dn) * 18px);
+  border: 0; border-radius: calc(var(--dn) * 12px); outline: 0; cursor: pointer;
+  font-family: "SofiaSansExtraCondensed-Light", "Oswald", sans-serif; font-size: calc(var(--dn) * 20px);
   letter-spacing: calc(var(--dn) * 0.6px); color: #ffffff; text-overflow: ellipsis; white-space: nowrap;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.26) 100%);
   box-shadow: inset 0 calc(var(--dn) * 2px) calc(var(--dn) * 6px) rgba(0, 0, 0, 0.55), inset 0 0 0 calc(var(--dn) * 1px) rgba(255, 255, 255, 0.12);
@@ -716,10 +718,10 @@ function _dtTplCss() {
 .dn-tpl-caret { position: absolute; top: 50%; right: calc(var(--dn) * 18px); width: calc(var(--dn) * 11px); height: calc(var(--dn) * 11px);
   margin-top: calc(var(--dn) * -8px); border-right: calc(var(--dn) * 2px) solid var(--m1); border-bottom: calc(var(--dn) * 2px) solid var(--m1);
   transform: rotate(45deg); pointer-events: none; }
-.dn-tpl-note { min-height: calc(var(--dn) * 23px); max-height: calc(var(--dn) * 46px); overflow: hidden;
+.dn-tpl-note { overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
   padding: 0 calc(var(--dn) * 24px); box-sizing: border-box;
-  font-size: calc(var(--dn) * 19px); line-height: calc(var(--dn) * 23px); color: rgba(255, 255, 255, 0.78); text-align: center;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  font-size: calc(var(--dn) * 19px); line-height: calc(var(--dn) * 20px); color: rgba(255, 255, 255, 0.78); text-align: center; }
+.dn-tpl-note:empty { display: none; }
 `;
   document.head.appendChild(s);
 }
