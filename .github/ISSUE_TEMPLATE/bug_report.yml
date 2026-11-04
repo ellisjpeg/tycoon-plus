@@ -1,0 +1,35 @@
+name: Something's broken
+description: Tycoon+ isn't working the way it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Please check it isn't already reported in the open issues first.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: tp-version
+    attributes:
+      label: Tycoon+ version
+      description: Run `DevicesTycoonMods.exe` and it shows the version, or check the release you downloaded.
+      placeholder: "1.0.0"
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options: [The .exe, Python, Other]
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Where do you play?
+      options: [Windows, Steam Deck / Linux (Proton), Other]
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+      description: Drag images in here. If the game shows an error, a screenshot of it helps a lot.

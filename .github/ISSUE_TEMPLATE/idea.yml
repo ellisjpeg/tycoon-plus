@@ -1,0 +1,11 @@
+name: Idea
+description: Something you'd like Tycoon+ to add or change
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe it the way you'd explain it to a friend. What would it help with while you play?
+    validations:
+      required: true

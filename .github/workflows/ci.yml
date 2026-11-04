@@ -1,0 +1,42 @@
+# Suggested CI. It runs everything that works without game files: the installer and bundle
+# tests, a syntax check of every script, and a check that no game files were committed.
+# The mod tests need game-files/ and run locally with ./run-tests.sh.
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Installer and bundle tests
+        run: python -X utf8 tests/test_install.py
+      - name: Python syntax
+        run: python -m compileall -q build.py install.py patcher tests mods
+      - name: JavaScript syntax
+        shell: bash
+        run: find mods -name '*.js' ! -name 'test_*' -print0 | xargs -0 -n1 node --check
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.4"
+      - name: Player installer (with an empty patch; the real one needs game files)
+        shell: bash
+        run: |
+          python -X utf8 tools/make_patch.py --stub player/mods.dtpatch
+          cd player && go vet . && go test . && go build -o "$RUNNER_TEMP/dtmods.bin" .
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o "$RUNNER_TEMP/test.exe" .
+      - name: No game files committed
+        shell: bash
+        run: |
+          [ -f player/mods.dtpatch.sha256 ] || { echo "player/mods.dtpatch.sha256 is missing (tools/build-exe.sh writes it)"; exit 1; }
+          if git ls-files | grep -E '(^|/)(c3main\.js|assets\.dat|data\.json|.*\.dt|.*\.dtpatch)$|^game-files/'; then
+            echo "Game files must not be committed"; exit 1
+          fi

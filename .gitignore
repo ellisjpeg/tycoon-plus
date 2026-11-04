@@ -1,0 +1,16 @@
+# Your own copy of the game's code (python3 install.py extract). Never commit it.
+game-files/
+# Anything build.py writes, and test output
+out/
+build/
+test-results/
+__pycache__/
+*.pyc
+# The player installer's patch and the built program (tools/build-exe.sh); attach them to a release
+player/mods.dtpatch
+dist/
+# Never commit saves or the game bundle
+*.dt
+assets.dat*
+.DS_Store
+._*

@@ -1,0 +1,58 @@
+# Builds the Windows installer for a release, in public, from the tagged source.
+#
+# The mods patch is the one part GitHub can't make: it is built from the game's own files,
+# which never leave a player's computer. So the maintainer makes it (./tools/build-exe.sh),
+# commits its SHA-256 as player/mods.dtpatch.sha256, pushes a tag, creates a DRAFT release
+# for that tag and attaches mods.dtpatch to it. This workflow then:
+#   1. checks out the tag and refuses a patch whose SHA-256 differs from the committed one,
+#   2. runs the installer tests and builds DevicesTycoonMods.exe (reproducibly),
+#   3. records a signed build attestation (anyone can check it: gh attestation verify),
+#   4. attaches the .exe and SHA256SUMS.txt to the draft. A person then reads it and publishes.
+# It never touches a published release. Steps are in tools/RELEASING.md.
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag of a draft release that has mods.dtpatch attached, e.g. v1.0.0"
+        required: true
+permissions:
+  contents: write      # attach files to the draft release
+  id-token: write      # sign the build attestation
+  attestations: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check the tag and the draft release
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Tag must look like v1.0.0"; exit 1; }
+          draft=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
+          [ "$draft" = "true" ] || { echo "$TAG must be a draft release; published releases are never changed"; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.4"   # the toolchain in player/go.mod; same version, same bytes
+          cache: false
+      - name: Fetch the mods patch from the draft release
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern mods.dtpatch --dir "$RUNNER_TEMP"
+      - name: Build (stops if the patch is not the one committed in player/mods.dtpatch.sha256)
+        env:
+          BUILT_BY: "the ${{ inputs.tag }} release, built by GitHub Actions from the public source"
+        run: ./tools/build-exe.sh --use-patch "$RUNNER_TEMP/mods.dtpatch"
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/DevicesTycoonMods.exe
+            dist/mods.dtpatch
+      - name: Attach to the draft release
+        run: |
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber dist/DevicesTycoonMods.exe dist/SHA256SUMS.txt
+          { echo '### Built'; echo '```'; cat dist/SHA256SUMS.txt; echo '```'
+            echo "BUILT_BY: the $TAG release, built by GitHub Actions from the public source"; } >> "$GITHUB_STEP_SUMMARY"

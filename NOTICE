@@ -1,0 +1,28 @@
+Tycoon+ for Devices Tycoon (unofficial)
+Copyright (c) 2026 JC Workshop. Licensed under the MIT License (see LICENSE).
+
+This project is an independent fan project. It is not affiliated with, endorsed by
+or supported by Roastery Games (the developer of Devices Tycoon), Scirra (the makers
+of Construct) or Valve (Steam).
+
+No part of the game is included. Devices Tycoon, its code, data, art, audio and text
+are the property of their owners and are not covered by this project's licence. The
+installer works only on a copy of the game that the user already owns and has
+installed, and it changes that copy only on the user's own computer.
+
+To find the places they change, the mods contain short pieces of the game's code
+(the text they search for and replace) and the names of the game's own variables,
+functions and arrays. These are there only so the mods can work with the game.
+
+The optional "names" mod (off by default) lists real company and brand names. They are trademarks of their
+owners, used only to name those companies. No owner is connected to this project.
+
+A few of the small line icons drawn by the mods follow shapes from Google's Material
+Icons, which are available under the Apache License 2.0
+(https://www.apache.org/licenses/LICENSE-2.0).
+
+The project includes no other third-party code. At build time it uses Python and
+Node.js from the user's own system.
+
+DevicesTycoonMods.exe (the player installer) is built with Go, whose standard library is
+Copyright (c) 2009 The Go Authors, under the BSD 3-Clause licence: https://go.dev/LICENSE
