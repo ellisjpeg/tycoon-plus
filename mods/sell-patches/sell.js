@@ -339,14 +339,15 @@ function _dtSellWrapTick() {
 
 // Stopped devices leave the Marketing device list (fillMarketingDevicesTemp
 // fills ArrayMarketingDevices_Temp, one column per device: type, ID, POP,
-// name, rating, release), so no campaign money goes to them.
+// name, rating, release), so no campaign money goes to them. Game update 1.4's
+// auto-marketing picks from listMarketingCandidates, so they leave that too.
 function _dtSellFilterMarketing(n) {
   _dtSellLoad();
-  if (!_dtSell.keys.size || !(n > 0) || typeof DEVICE_ARRAYS3 === "undefined") return n;
+  if (!_dtSell.keys.size || !(n > 0) || typeof DEVICE_ARRAYS2 === "undefined") return n;
   const t = _dtSellArr("ArrayMarketingDevices_Temp");
   if (!t || typeof t.setSize !== "function") return n;
   const arrOf = {};
-  for (const e of DEVICE_ARRAYS3) if (e && e.marketingType) arrOf[e.marketingType] = e.name;
+  for (const e of DEVICE_ARRAYS2) if (e && e.marketingType) arrOf[e.marketingType] = e.name;
   const w = t.width | 0, keep = [];
   for (let x = 0; x < w; x++) {
     const row = [0, 1, 2, 3, 4, 5].map((y) => t.getAt(x, y, 0));
@@ -373,6 +374,20 @@ function _dtSellWrapMarketing() {
     }
   };
   globalThis.fillMarketingDevicesTemp = fillMarketingDevicesTemp;
+  if (typeof listMarketingCandidates !== "function") return;
+  const list = listMarketingCandidates;
+  listMarketingCandidates = function () {
+    const out = list.apply(this, arguments);
+    try {
+      _dtSellLoad();
+      if (!_dtSell.keys.size || !Array.isArray(out)) return out;
+      return out.filter((c) => !(c && _dtSell.keys.has(_dtSellLogic.key(c.arrayName, c.id, c.release, c.name))));
+    } catch (e) {
+      console.warn("[Sell] auto-marketing list:", e);
+      return out;
+    }
+  };
+  globalThis.listMarketingCandidates = listMarketingCandidates;
 }
 
 // ── Pop-ups (the game's own news box look, ui.js) ──

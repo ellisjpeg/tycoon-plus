@@ -63,7 +63,7 @@ function world(opts) {
   vm.createContext(ctx);
   vm.runInContext(ENGINE, ctx, { filename: "c3main-DeviceSales" });
   // The Marketing list filler (same column layout as the game's fillMarketingDevicesTemp).
-  vm.runInContext(`var DEVICE_ARRAYS3 = [{ name: "ArraySmartphones", marketingType: "SMARTPHONES" }, { name: "ArrayGamepads", marketingType: null }];
+  vm.runInContext(`var DEVICE_ARRAYS2 = [{ name: "ArraySmartphones", marketingType: "SMARTPHONES" }, { name: "ArrayGamepads", marketingType: null }];
     function fillMarketingDevicesTemp(rt) {
       const a = rt.objects.ArraySmartphones.getFirstInstance(), t = rt.objects.ArrayMarketingDevices_Temp.getFirstInstance(), r = [];
       for (let x = 0; x < a.width; x++) for (let y = 0; y < 3; y++) {
@@ -73,7 +73,18 @@ function world(opts) {
       t.setSize(r.length, 6, 1);
       r.forEach((row, x) => row.forEach((v, y) => t.setAt(v, x, y, 0)));
       return r.length;
-    }`, ctx, { filename: "marketing-fake" });
+    }
+    // Auto-marketing's candidates (same fields as the game's listMarketingCandidates), read by name.
+    function listMarketingCandidates(rt) {
+      const a = rt.objects.ArraySmartphones.getFirstInstance(), r = [];
+      for (let x = 0; x < a.width; x++) for (let y = 0; y < 3; y++) {
+        if (a.getAt(x, y, 0) === -1 || a.getAt(x, y, 7) < 0) continue;
+        r.push({ type: "SMARTPHONES", id: a.getAt(x, y, 10), arrayName: "ArraySmartphones", x, y, name: String(a.getAt(x, y, 8)),
+          rating: a.getAt(x, y, 5), pop: a.getAt(x, y, 2), release: a.getAt(x, y, 7) });
+      }
+      return r;
+    }
+    function autoMarketingPicks(rt) { return listMarketingCandidates(rt).map((c) => c.name); }`, ctx, { filename: "marketing-fake" });
   vm.runInContext(fs.readFileSync(SELL, "utf8"), ctx, { filename: "sell.js" });
   return { ctx, phones, saves, gv, runtime, ui, api: ctx._dtSellApi };
 }
@@ -255,6 +266,13 @@ test("stopped devices leave the Marketing device list", () => {
   w.api.stop(T(w), w.phones, 0);
   assert.equal(vm.runInContext("fillMarketingDevicesTemp(runtime)", w.ctx), 1);
   same(names(), ["Ember 5"]);
+});
+
+test("auto-marketing (game update 1.4) never picks a stopped device", () => {
+  const w = world();
+  same(vm.runInContext("autoMarketingPicks(runtime)", w.ctx), ["Ember 6", "Ember 6 Pro", "Ember 5"]);
+  w.api.stop(T(w), w.phones, 0);
+  same(vm.runInContext("autoMarketingPicks(runtime)", w.ctx), ["Ember 5"]);
 });
 
 test("New Game in a used slot forgets the old campaign's stopped devices", () => {

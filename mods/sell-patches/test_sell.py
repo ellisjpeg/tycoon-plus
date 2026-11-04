@@ -47,9 +47,10 @@ class SellTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             patch.transform(self.source, self.data.replace('"MyTabletsShow"', '"MyTabletsShow2"'))
         # The price is re-read daily, POP 0 is skipped and the tick is called by name.
-        for old in ('M=g.getAt(b,x,Z13.SELL)', '*_priceFactor(t,n,e,l)/(i>1?i:1)',
-                    'if(T<=0){T<0&&g.setAt(0,b,x,Z13.POP)', '!w&&Y>0&&V-H<=H',
-                    'EventGameplay_Event448_Act1(e,t){tickDeviceSales('):
+        for old in ('M=m.getAt(b,x,Z13.SELL)', '*_priceFactor(t,n,e,l)/(i>1?i:1)',
+                    'if(T<=0){T<0&&m.setAt(0,b,x,Z13.POP)', '!w&&Y>0&&V-H<=H',
+                    'EventGameplay_Event449_Act1(e,t){tickDeviceSales(',
+                    'for(const e of listMarketingCandidates(n)){'):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source.replace(old, old[:-2] + '#!'), self.data)
 
