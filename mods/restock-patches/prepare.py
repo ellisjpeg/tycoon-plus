@@ -24,7 +24,7 @@ REQUIRED_JS = (
     'const g={contractEnd:void 0,earned:0,restockCost:0,contractFee:0,soldedNotified:!1}',
     # Restock fees are the game's own restockCost, which tickDeviceSales books as Production in the
     # game's finance ledger (game update 1.6), so the game's money stats include them.
-    'globalThis.financeRecord?.("production",-Math.round(g.restockCost)-Math.round(g.contractFee))',
+    'financeRecord?.("production",-Math.round(g.restockCost)',
     'C=r?_slotKey(r.name,e,n,l):null',
     'return e+":id"+a}}catch(e){}return e+":"+n+":"+o}',
     # Off: POP under the minimum skips the order but keeps the sold-out message.

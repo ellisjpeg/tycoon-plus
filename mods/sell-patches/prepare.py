@@ -40,7 +40,7 @@ REQUIRED_JS = (
     # Auto-marketing (game update 1.4+) picks its devices from this list, by name, once a day.
     'function listMarketingCandidates(e,t){',
     'for(const e of listMarketingCandidates(n)){',
-    'type:e.marketingType,id:l,arrayName:e.name,x:n,y:s,name:String(t.getAt(n,s,Z14.NAME))',
+    'arrayName:e.name,x:n,y:s,name:String(t.getAt(n,s,Z14.NAME))',
     'release:i,age:o-i,',
     'TEMP_ARRAY_NAME="ArrayMarketingDevices_Temp"',
 )

@@ -59,9 +59,9 @@ class ResearchFilterTests(unittest.TestCase):
         const t={{classList:{{toggle(){{}}}}}};
         const row=(id,icon,active=!0)=>({{id,icons:[icon],active}});
         function draw(rows){{_rows=rows;{patch.DRAW_NEW}
-          const i=[];for(const e of (_hideUnavailable?_rows.filter(e=>e.active):_rows))for(const c of e.icons)i.includes(c)||i.push(c);
-          i.includes(_activeCategory)||(_activeCategory="");
-          const all=_rows.filter(e=>e.active&&!(_activeCategory&&e.icons.length&&!e.icons.includes(_activeCategory)));
+          const shown=_hideUnavailable?_rows.filter(r=>r.active):_rows,icons=new Set(shown.flatMap(r=>r.icons));
+          if(!icons.has(_activeCategory))_activeCategory="";
+          const all=_rows.filter(r=>r.active&&(!_activeCategory||!r.icons.length||r.icons.includes(_activeCategory)));
           log.push(_activeCategory+":"+all.length)}}
         function tap(e){{{tap}}}
         const A=[row(1,"Smartphone"),row(2,"Laptop")];
