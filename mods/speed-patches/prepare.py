@@ -12,8 +12,8 @@ ANCHOR = 'const w=Math.max(1,Math.round(h)),v={stage:e'
 HOOK = 'h=_dtSpeedPlan(h,f,_,e,i);'
 # The planner's locals the hook relies on: h work, f points/sec, _ staff, e stage, i weight.
 REQUIRED = (
-    'const f=Math.max(.01,m.pps),b=h/f',
-    '_=_officeStaff(o,a),m=_throughput(',
+    'const f=Math.max(.01,g.pps),b=h/f',
+    '_=_officeStaff(o,a),g=_throughput(',
     'function computeBubblesPlan(e,t){const n=t||{},o=_runtime26(n.runtime),a=STAGES[e]',
     'i=_clamp11(Number.isFinite(n.weight)?Number(n.weight):1,.01,3)',
     'MIN_SEC:12,MAX_SEC:40',

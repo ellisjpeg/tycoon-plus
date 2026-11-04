@@ -127,7 +127,7 @@ function _dtDiffPage(opts) {
     _el2("div", "", empty).textContent = _dtDiffGsT("noCompany");
   } else {
     const defaults = _el2("div", "gs-btn gs-btn-ghost", row);
-    defaults.textContent = _t8("defaults");
+    defaults.textContent = _t11("defaults");
     defaults.addEventListener("click", () => {
       globalThis.tapMain?.();
       setPreset("original");

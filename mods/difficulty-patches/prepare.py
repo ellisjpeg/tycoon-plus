@@ -33,7 +33,7 @@ REQUIRED = (
     'NPC_MARKET_BASE_EARN_B:', 'NPC_MARKET_BASE_FANS_M:',
     'function _tickNpcRow(e,t,n,o)',  # rival growth hook
     'function _companyName(e)',  # stable per-rival seed
-    'const f=Math.max(.01,m.pps),b=h/f',
+    'const f=Math.max(.01,g.pps),b=h/f',
     'function _officeStaff(e,t)', 'function _throughput(e,t)',  # research.js reads staff
     'function _inst45(e,t)', 'function _at41(e,t,n,o)', 'STAGES={design:{',
     'function _readRows(){',  # research page rows (thin.js, real.js)
@@ -43,7 +43,7 @@ REQUIRED = (
     'function _renderNav(){', 'function _navItem(e,t,n,o,a){', 'function _renderMain(e){',
     'function _row14(e,t,n){', 'function _card(e){', 'function _slider(e,t,n,o,a,s,r){', 'function _el2(e,t,n){',
     'function _maskIcon(e,t,n){', 'function _readAll(){', 'function applyGameSettings(){', 'function _syncFooter(){',
-    'function _t8(e){', '_page="general"', '_container15=null', '_draft=null,_saved=null',
+    'function _t11(e){', '_page="general"', '_container15=null', '_draft=null,_saved=null',
     'gs-nav-item"+(_page===t?" gs-nav-on":"")',
     'if(s.dataset.page=t,',  # nav items carry their page id (the Video item is the anchor)
 )

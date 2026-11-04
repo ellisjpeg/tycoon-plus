@@ -55,7 +55,7 @@ const GAME = `
 var _container15 = null, _draft = null, _saved = null, _page = "general", footerSyncs = 0, applied = 0;
 var rowCells = {};
 function _el2(e, t, n) { const o = document.createElement(e); return t && (o.className = t), n && n.appendChild(o), o; }
-function _t8(e) { return e === "defaults" ? "Defaults" : e; }
+function _t11(e) { return e === "defaults" ? "Defaults" : e; }
 function _maskIcon(e, t, n) { const o = _el2("div", t, e); o.mask = n; return o; }
 function _navItem(e, t, n, o, a) {
   const s = _el2("div", "gs-nav-item" + (_page === t ? " gs-nav-on" : ""), e);

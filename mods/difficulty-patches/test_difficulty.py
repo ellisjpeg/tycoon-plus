@@ -83,7 +83,7 @@ class DifficultyTests(unittest.TestCase):
             'missing company name': self.source.replace(
                 'function _companyName(e)', 'function _companyName2(e)'),
             'missing planner': self.source.replace(
-                'const f=Math.max(.01,m.pps),b=h/f', 'const f=Math.max(.01,m.pps),b=h/g'),
+                'const f=Math.max(.01,g.pps),b=h/f', 'const f=Math.max(.01,g.pps),b=h/g'),
             'row already used': self.source + '\n// ROW=150',
             'missing research bubble': self.source.replace(patch.BUBBLE, 'return()=>1'),
             'missing office staff': self.source.replace('function _officeStaff(e,t)', 'function _staff2(e,t)'),
