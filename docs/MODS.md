@@ -4,8 +4,7 @@ Tycoon+ is made of small mods. The installer adds all of them except `names`. Wi
 
 | Name | What it does | Needs |
 |---|---|---|
-| `assistant` | Fix: "No" closes the "hold a presentation of your new device?" offer. | |
-| `template` | "Start from a previous device" on the name screen. | |
+| `template` | "Start from a past model's specs" on the name screen: copies the specs and parts of a past model. The looks are left to the game's own "Copy the design of a past model" button, so the two work together. | |
 | `speed` | Big, strong offices build faster. Start-ups are unchanged. | |
 | `launch` | Launch a reviewed device today or plan a date, a "Ready to launch" shelf, and launch events for several devices at once. | |
 | `difficulty` | Per-company sliders and presets for buying, part costs, research speed, competitors and build speed. Outside "Original", phone parts follow real dates and prices. | |
@@ -30,6 +29,18 @@ Tycoon+ is made of small mods. The installer adds all of them except `names`. Wi
 ## About `names`
 
 The game uses parody names on purpose, so this one is opt-in. All names and trademarks belong to their owners, and this project has no link to any of them.
+
+## Game update 1.6
+
+Tycoon+ is made for game update 1.6 (Steam build of 20 October 2026) and works with its new features:
+
+- `assistant` is gone: the game now closes the presentation offer on "No" by itself.
+- `template` sits under the game's new look copy and leaves the looks to it.
+- `sell`: auto-marketing never spends money on a device you stopped selling.
+- `restock` and `bulkhire`: their costs show in the stats page's Finance tab (Production and Hiring).
+- `year`: revenue now includes OS income, as on the game's stats page, and the year's profit matches the Finance tab.
+- `researchfilter`: "Research all" covers the cards on show, filter included. In sandbox mode it covers everything, as in the game.
+- `bulkhire`: the new recruitment table counts a bulk search like one big search. Auto-hire is never multiplied.
 
 ## Known issues
 

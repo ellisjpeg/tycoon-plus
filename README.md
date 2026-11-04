@@ -18,7 +18,7 @@ Queue up your next phone while the current one is still being built. Pick your o
 - **Build queue.** Design your next device while another one is in development. It waits in line and starts on its own.
 - **Three projects at once.** Each of your three work rooms can build something at the same time, with a button to hop between them.
 - **Launch day.** Once a device is reviewed, launch it today or plan a date. Several devices can go out together at one launch event, and the "hold a presentation?" offer comes on the day it goes on sale.
-- **Start from a previous device.** Copy one of your old designs as the starting point for a new one.
+- **Start from a past model's specs.** On the name screen, copy the specs and parts of a device you made before (or one waiting in your build queue). The game's own "Copy the design of a past model" button sits right above it, so you can take the looks from one model and the insides from another.
 - **Hire in bulk.** On Find Employees, run up to 20 searches at once on an agency (each extra search costs 50% more).
 
 ### Know what's going on
@@ -40,9 +40,10 @@ Queue up your next phone while the current one is still being built. Pick your o
 - No more lag when you tap quickly in the phone and tablet editor.
 - The device filter on the research screen stays picked when you switch tabs.
 - Bigger, easier-to-read office news cards.
-- Fixed: "No" now actually closes the "hold a presentation?" offer.
 
 Everything works in English and Russian, like the game.
+
+**Made for game update 1.6.** Tycoon+ plays nicely with the game's newer features: devices you stopped selling are left out of auto-marketing, restocking and bulk hiring show up in the stats page's new Finance tab, and the research filter works with Research all (it covers the cards on show). The game fixed the presentation "No" button itself, so Tycoon+ no longer touches it.
 
 | ![Sales board](docs/images/sales-board.png) | ![Planning a launch event](docs/images/launch-event.png) |
 |---|---|
@@ -53,7 +54,7 @@ Everything works in English and Russian, like the game.
 
 ## Install
 
-You need Devices Tycoon from Steam on Windows. Tycoon+ doesn't include any of the game's files; it changes your own copy, on your own computer, and keeps a backup so you can go back.
+You need Devices Tycoon from Steam on Windows, with game update 1.6 (out 20 October 2026; Steam installs it for you). Tycoon+ doesn't include any of the game's files; it changes your own copy, on your own computer, and keeps a backup so you can go back.
 
 **Before you start:** close the game and copy your saves somewhere safe (`Documents\Devices Tycoon`).
 
