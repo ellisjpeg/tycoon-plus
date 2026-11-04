@@ -410,7 +410,7 @@ function _dtYearFreeNow() {
   const rt = _dtYearRt();
   if (!rt || !_dtUi.onOffice() || _dtUi.isOpen()) return false;
   try {
-    if (_container100 && _container100.isConnected && _container100.querySelector("#stats-root")) return false;
+    if (_container102 && _container102.isConnected && _container102.querySelector("#stats-root")) return false;
   } catch (e) {}
   const gv = rt.globalVars;
   if (String(gv.class || "") !== "GAMEPLAY") return false;
@@ -577,7 +577,7 @@ function _dtYearOpen(y) {
 // The stats page is up: Years tab with year y (null: the list).
 function _dtYearShow(y) {
   let root = null;
-  try { root = _container100 && _container100.isConnected ? _container100.querySelector("#stats-root") : null; } catch (e) {}
+  try { root = _container102 && _container102.isConnected ? _container102.querySelector("#stats-root") : null; } catch (e) {}
   if (!root || typeof _renderBody2 !== "function") return false;
   _dtYear.detail = y;
   _tab = "years";
@@ -677,7 +677,7 @@ function _dtYearTabHtml() {
 }
 function _dtYearTabLabel() {
   try {
-    const t = _container100 && _container100.querySelector('.st-tab[data-tab="years"]');
+    const t = _container102 && _container102.querySelector('.st-tab[data-tab="years"]');
     if (t) t.textContent = _dtYearT("tab");
   } catch (e) {}
 }
@@ -688,7 +688,7 @@ function _dtYearWireTab() {
   _renderBody2 = (function (orig) {
     return function (opts) {
       if (_tab !== "years") return orig.apply(this, arguments);
-      const root = _container100 && _container100.querySelector("#stats-root"), body = root && root.querySelector("#st-body");
+      const root = _container102 && _container102.querySelector("#stats-root"), body = root && root.querySelector("#st-body");
       if (!root || !body) return;
       _dtYearCss();
       root.classList.toggle("st-no-entry", !!(opts && opts.noEntry));

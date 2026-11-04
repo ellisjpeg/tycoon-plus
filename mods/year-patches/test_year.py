@@ -48,9 +48,10 @@ class YearTests(unittest.TestCase):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source, self.data.replace(old, old[:-1] + '2"'))
         # Day order, monthly history, rank/share and the stats page hooks.
-        for old in ('EventGameplay_Event454_Act1(e,t){tickCompanyStatsDay(e)}', 't.fan[o]=_round(e.fan,0)',
+        for old in ('EventGameplay_Event455_Act1(e,t){tickCompanyStatsDay(e)}', 't.fan[o]=_round(e.fan,0)',
                     'e.share=t.total>0?n.earn/t.total*100:0', '_TAB_LIST=[["overview","tabOverview"],',
-                    'function _renderBody2(e){if(!_container100)return;', 'EventGameplay_Event453_Act1(e,t){tickRatingsDay('):
+                    'function _renderBody2(e){if(!_container102)return;', 'EventGameplay_Event454_Act1(e,t){tickRatingsDay(',
+                    'const h=u+Math.max(0,o.earn)+m,f=c?0:s-d.budget'):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source.replace(old, old[:-2] + '#!'), self.data)
 

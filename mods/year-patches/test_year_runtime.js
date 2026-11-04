@@ -1,5 +1,5 @@
 // Runtime test for year.js on top of the game's REAL company stats code: the
-// stats block (var _container100 ... _container101, with tickCompanyStatsDay,
+// stats block (var _container102 ... _container103, with tickCompanyStatsDay,
 // _pushMonthly, _readRatings and the stats page tabs) is cut out of c3main.js
 // and run in a vm with a small fake Construct runtime and calendar, then
 // year.js is loaded. Days are played by hand: sales are written to SOLDED and
@@ -14,7 +14,7 @@ const HERE = __dirname;
 const C3MAIN = process.argv[2] || path.join(HERE, "../../game-files/scripts/c3main.js");
 const YEAR = process.argv[3] || path.join(HERE, "year.js");
 const game = fs.readFileSync(C3MAIN, "utf8");
-const a0 = game.indexOf("var _container100=null"), a1 = game.indexOf("var _container101=null");
+const a0 = game.indexOf("var _container102=null"), a1 = game.indexOf("var _container103=null");
 assert.ok(a0 > 0 && a1 > a0, "stats block not found in c3main.js");
 const STATS = game.slice(a0, a1);
 const YEARJS = fs.readFileSync(YEAR, "utf8");
@@ -175,6 +175,11 @@ const near = (a, b, msg) => assert.ok(Math.abs(a - b) <= Math.max(1, Math.abs(b)
   const g = gameYear(w, 2013);
   assert.equal(g.n, 12);
   assert.equal(r.rev, Math.round(g.rev)); assert.equal(r.un, Math.round(g.un)); assert.equal(r.prof, Math.round(g.prof));
+  // The finance ledger of game update 1.6 books the same days: the card's profit is the Finance tab's
+  // income minus expenses for those 12 months.
+  const fin = w.t.st().fin.m.filter((m) => Math.floor(m.ym / 12) === 2013), sum = (o) => Object.values(o).reduce((x, v) => x + v, 0);
+  assert.equal(fin.length, 12, "ledger has the 12 months");
+  assert.equal(r.prof, Math.round(fin.reduce((x, m) => x + sum(m.i) - sum(m.e), 0)), "card profit = Finance tab income - expenses");
   assert.equal(r.fans, 10 + 20 * 364, "fans gained: 31 Dec 2013 - 31 Dec 2012");
   // 1 Jan: 100 sold at $300; 2 Jan..1 Jul (181 days): 200 a day at $300; 2 Jul..31 Dec (183 days) at $400.
   const after = 183;

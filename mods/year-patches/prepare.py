@@ -18,28 +18,32 @@ DATA = PORT / 'game-files/data.json'
 REQUIRED_JS = (
     # Device columns; the day runs sales, fans and ratings before the stats day.
     'var Z13={CREATED:0,SOLDED:1,POP:2,COST:3,SELL:4,RATING:5,HYPE:6,RELEASE:7,NAME:8}',
-    'EventGameplay_Event448_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
-    'EventGameplay_Event453_Act1(e,t){tickRatingsDay(',
-    'EventGameplay_Event454_Act1(e,t){tickCompanyStatsDay(e)}',
+    'EventGameplay_Event449_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
+    'EventGameplay_Event454_Act1(e,t){tickRatingsDay(',
+    'EventGameplay_Event455_Act1(e,t){tickCompanyStatsDay(e)}',
     'function tickCompanyStatsDay(e){e&&!globalThis.runtime&&(globalThis.runtime=e),_loadState();',
     'globalThis.tickCompanyStatsDay=tickCompanyStatsDay',
     # Monthly history: ym = 12*year + month-1, summed per day, fan = last value.
     'm:{ym:[],rev:[],exp:[],prof:[],un:[],fan:[],val:[],px:[]}',
     'function _pushMonthly(e){const t=_S5.m,n=12*e.year+(e.month-1),o=t.ym.length-1;if(o>=0&&t.ym[o]===n)return t.rev[o]=_round(t.rev[o]+e.rev,0)',
     't.fan[o]=_round(e.fan,0)',
-    '_pushMonthly({year:_gvNum49("Year",2008),month:_gvNum49("Month",1),rev:g,exp:f,prof:h,un:p,fan:r,',
+    # Since game update 1.6: revenue = device sales + software + OS income, profit = the day's change in
+    # cash (what the game's finance ledger closes the day with), expenses = revenue - profit.
+    'const h=u+Math.max(0,o.earn)+m,f=c?0:s-d.budget,b=Math.max(0,h-f)',
+    '_pushMonthly({year:_gvNum49("Year",2008),month:_gvNum49("Month",1),rev:h,exp:b,prof:f,un:p,fan:r,',
+    '_finCloseDay(c?null:s-d.budget)',
     'function _loadState(){if(_stateLoaded&&_S5)return _S5;',
     # Rank and share as the Market tab shows them.
     'function _readRatings(){const e={value:0,earn:0,rate:0,share:0,fans:0,rank:0,companies:0},t=_scanCompanies();e.companies=t.rows.length,e.rank=t.rank;',
     'e.share=t.total>0?n.earn/t.total*100:0',
     # Stats page: tab list, body renderer, entry point and the shared state.
     '_TAB_LIST=[["overview","tabOverview"],',
-    'function _renderBody2(e){if(!_container100)return;',
-    'function initStatsPage(e){if(!e)return!1;_container100=e,',
+    'function _renderBody2(e){if(!_container102)return;',
+    'function initStatsPage(e){if(!e)return!1;_container102=e,',
     'function updateStatsPage(){',
     'globalThis.initStatsPage=initStatsPage,globalThis.updateStatsPage=updateStatsPage',
     'EventStats_Event3_Act1(e,t){const n=e.objects.MyHTML_Stats.getFirstInstance();n&&initStatsPage(n.getElement())}',
-    'var _container100=null,_cssInjected17=!1,_resizeObs23=null,_tab="overview",',
+    'var _container102=null,_cssInjected17=!1,_resizeObs23=null,_tab="overview",',
     'var _chartData={};',
     '_tab=t.dataset.tab,_renderBody2({})',
 )

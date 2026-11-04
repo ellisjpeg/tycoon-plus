@@ -6,7 +6,7 @@ board patch (see `PATCH_STEPS` in `build.py`). Flag off = byte-identical to the 
 ## What the card shows (and where each number comes from)
 | Figure | Source |
 |---|---|
-| Revenue, profit, devices sold | Sum of the game's own monthly history for that year: `_loadState().m` (`rev`, `prof`, `un`), written once a day by `_pushMonthly` from `tickCompanyStatsDay` (c3main.js, `function tickCompanyStatsDay` / `function _pushMonthly`). Same figures as the stats page "Monthly dynamics". |
+| Revenue, profit, devices sold | Sum of the game's own monthly history for that year: `_loadState().m` (`rev`, `prof`, `un`), written once a day by `_pushMonthly` from `tickCompanyStatsDay` (c3main.js, `function tickCompanyStatsDay` / `function _pushMonthly`). Same figures as the stats page "Monthly dynamics". Since game update 1.6 revenue includes OS income, and profit (the year's change in cash) equals the stats page's Finance tab, income minus expenses, for the same 12 months. |
 | Fans gained | `m.fan` of the last month of the year minus the year before (31 Dec values); a partial first year counts from the recording day's `Fans`. |
 | Rank among rivals, market share | The year's revenue (the game's months) against each rival's yearly revenue (`_scanCompanies()` over `ArrayRatingsCompanies`, column 4 in B$), read on 1 January after `tickRatingsDay`. The stats Market tab ranks the player by the last 180 days instead, so a company whose devices sold out in the spring came out last on 1 January. The movement is against the year before when that year was counted the same way (`rm: 2`); years saved before this change keep their old rank and are not compared with. |
 | Best / weakest device | Own record: each game day, every released edition's `SOLDED` change (Z13 col 1) x that day's `SELL - COST` (col 4 - col 3), floored at 0 like `_slotProfit`. Sorted by that year's profit. |
@@ -37,4 +37,4 @@ one row per year (revenue, profit, sold, fans, rank); a tap opens that year's ca
 ## Tests
 `python3 mods/year-patches/test_year.py` (from the repo folder): build checks, flag-off byte-identical, `node --check` of
 the whole chain, and `test_year_runtime.js`, which runs year.js on the game's REAL stats code (the
-`_container100 ... _container101` block) across several New Years.
+`_container102 ... _container103` block) across several New Years.
