@@ -45,28 +45,40 @@ class ResearchFilterTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             subprocess.run(['python3', str(ROOT / 'build.py'), d], check=True, capture_output=True)
             text = (Path(d) / 'scripts/c3main.js').read_text(encoding='utf-8')
-            self.assertEqual(text.count('_dtResCat'), 4)
+            self.assertEqual(text.count('_dtResCat'), 5)
 
     def test_pick_carries_across_tabs(self):
         # Run the three patched lines as written, with a stand-in page: the game's tab change
         # and reopen clear _activeCategory, then draw; the pick must come back.
         out = patch.transform(self.source)
         tap = patch.TAP_NEW.split(',_renderContent()')[0]
+        # draw(tab): the patched first line, then the game's own icon check and the rows its
+        # "Research all" button covers (_visibleActiveRows), as _renderContent runs them.
         js = f'''
-        var _activeCategory="",_dtResCat="",log=[];
-        function draw(s){{{patch.DRAW_NEW};log.push(_activeCategory)}}
+        var _activeCategory="",_dtResCat="",_hideUnavailable=!1,_rows=[],log=[];
+        const t={{classList:{{toggle(){{}}}}}};
+        const row=(id,icon,active=!0)=>({{id,icons:[icon],active}});
+        function draw(rows){{_rows=rows;{patch.DRAW_NEW}
+          const i=[];for(const e of (_hideUnavailable?_rows.filter(e=>e.active):_rows))for(const c of e.icons)i.includes(c)||i.push(c);
+          i.includes(_activeCategory)||(_activeCategory="");
+          const all=_rows.filter(e=>e.active&&!(_activeCategory&&e.icons.length&&!e.icons.includes(_activeCategory)));
+          log.push(_activeCategory+":"+all.length)}}
         function tap(e){{{tap}}}
-        draw(["Smartphone","Laptop"]); tap("Laptop"); draw(["Smartphone","Laptop"]);
-        _activeCategory=""; draw(["Laptop","Watch"]);          // tab change: game clears, pick returns
-        _activeCategory=""; draw(["Smartphone"]);              // tab without laptops: show all
-        _activeCategory=""; draw(["Laptop"]);                  // next tab with laptops: back again
-        tap("Laptop"); draw(["Laptop"]);                       // tap lit icon: cleared everywhere
-        _activeCategory=""; draw(["Laptop","Smartphone"]);
+        const A=[row(1,"Smartphone"),row(2,"Laptop")];
+        draw(A); tap("Laptop"); draw(A);
+        _activeCategory=""; draw([row(3,"Laptop"),row(4,"Watch"),row(5,"Laptop")]);  // tab change: pick returns
+        _activeCategory=""; draw([row(6,"Smartphone")]);       // tab without laptops: show all
+        _activeCategory=""; draw([row(7,"Laptop")]);           // next tab with laptops: back again
+        _hideUnavailable=!0; _activeCategory=""; draw([row(8,"Laptop",!1),row(9,"Watch")]);  // laptops hidden: show all
+        _hideUnavailable=!1; _activeCategory=""; draw([row(7,"Laptop")]);  // shown again: pick back
+        tap("Laptop"); draw([row(7,"Laptop")]);                // tap lit icon: cleared everywhere
+        _activeCategory=""; draw(A);
         console.log(JSON.stringify(log));
         '''
         self.assertIn(patch.DRAW_NEW, out)
         r = subprocess.run(['node', '-e', js], check=True, capture_output=True, text=True)
-        self.assertEqual(r.stdout.strip(), '["","Laptop","Laptop","","Laptop","",""]')
+        # Research all covers exactly the cards on show.
+        self.assertEqual(r.stdout.strip(), '[":2","Laptop:1","Laptop:2",":1","Laptop:1",":1","Laptop:1",":1",":2"]')
 
 
 if __name__ == '__main__':
