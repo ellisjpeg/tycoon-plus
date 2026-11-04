@@ -23,11 +23,11 @@ JS_TEXT = (
     ('[icon=CPU]  MediaRek M700+', '[icon=CPU]  MediaTek M700+', 1),
     ('[icon=Dynamics]  Somy 3 MAX', '[icon=Dynamics]  Sony 3 MAX', 1),
 )
-# The game's file save/load (Settings.dt holds ArrayCompanyNames once the player edits a name): the saved copy
-# keeps the game's own names, the loaded copy gets the real names back (names.js).
+# The game's file save/load (_doSave, rewritten in game update 1.6; Settings.dt holds ArrayCompanyNames once the
+# player edits a name): the saved copy keeps the game's own names, the loaded copy gets the real names back (names.js).
 FILE_HOOKS = (
-    ('const t=_snapshotArray(e);t&&(a.arrays[e]=t)',
-     'const t=_snapshotArray(e);globalThis._dtNamesSaving&&globalThis._dtNamesSaving(e,t);t&&(a.arrays[e]=t)', 1),
+    ('const t=_snapshotArray(e);t&&(s.arrays[e]=t)',
+     'const t=_snapshotArray(e);globalThis._dtNamesSaving&&globalThis._dtNamesSaving(e,t);t&&(s.arrays[e]=t)', 1),
     ('_restoreArray(t,n)&&o.push(t)',
      '_restoreArray(t,n)&&(globalThis._dtNamesRestored&&globalThis._dtNamesRestored(t),o.push(t))', 1),
 )
