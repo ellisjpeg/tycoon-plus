@@ -42,6 +42,8 @@ var _dtBulk = (function () {
 
   // ── the search itself ──
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  // The game's finance ledger (game update 1.6): extra searches count as Hiring, like the game's own.
+  function book(v) { try { globalThis.financeRecord && globalThis.financeRecord("staff", v); } catch (e) {} }
   function run(e) {
     const g = (rt() || {}).globalVars;
     if (!g || !onScreen()) return _dtFindOne(e);
@@ -51,6 +53,10 @@ var _dtBulk = (function () {
     while (n > 1 && cost(k, n) > (Number(g.Budget) || 0) + TIERS[k].price) n = STEPS[STEPS.indexOf(n) - 1];
     if (n <= 1) return _dtFindOne(e);
     g.Budget -= cost(k, n) - TIERS[k].price;
+    book(-(cost(k, n) - TIERS[k].price));
+    // The recruitment table (game update 1.6) shows Found as it was before the click until the
+    // results are in: only the first search of the run may take that snapshot.
+    const hold = typeof _tblHoldForSearch === "function" ? _tblHoldForSearch : null;
     const found = [];
     let rep = null, done = 0;
     for (; done < n; ) {
@@ -58,14 +64,22 @@ var _dtBulk = (function () {
         g.FindEmployeesCountRandom = pick(TIERS[k].counts);
         g.FindEmployeesCharacters = Math.round(TIERS[k].lo + Math.random() * (TIERS[k].hi - TIERS[k].lo));
       }
-      rep = _dtFindOne(e);
+      if (done && hold) _tblHoldForSearch = function () {};
+      try {
+        rep = _dtFindOne(e);
+      } finally {
+        if (hold) _tblHoldForSearch = hold;
+      }
       done++;
       if (rep && rep.found) for (const f of rep.found) found.push(f);
       // Everyone of this profession is found or hired: stop and pay back the searches not run.
       if (!rep || rep.poolSize - (rep.found ? rep.found.length : 0) <= 0) break;
     }
-    if (done < n) g.Budget += (n - done) * unit(k);
-    const t = _rt10(e), temp = _inst13(t, CFG.TEMP_ARRAY);
+    if (done < n) {
+      g.Budget += (n - done) * unit(k);
+      book((n - done) * unit(k));
+    }
+    const t = _rt11(e), temp = _inst13(t, CFG.TEMP_ARRAY);
     if (temp && typeof temp.setSize === "function") {
       temp.setSize(found.length, Math.max(1, 0 | temp.height), Math.max(1, 0 | temp.depth));
       for (let i = 0; i < found.length; i++) temp.setAt(found[i].id, i, 0, 0);

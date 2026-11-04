@@ -9,14 +9,22 @@ candidates, skills and salaries come from the game's own code.
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-OLD = 'function findEmployees(e){const t=_rt10(e),n=t.globalVars||{};normalizeEmployeeArrays(t);'
-NEW = 'function _dtFindOne(e){const t=_rt10(e),n=t.globalVars||{};normalizeEmployeeArrays(t);'
+OLD = 'function findEmployees(e){const t=_rt11(e),n=t.globalVars||{};normalizeEmployeeArrays(t),_tblHoldForSearch();'
+NEW = 'function _dtFindOne(e){const t=_rt11(e),n=t.globalVars||{};normalizeEmployeeArrays(t),_tblHoldForSearch();'
 # What bulk.js uses from the game's employee module, and the report it reads.
 REQUIRED = (
     'globalThis.findEmployees=findEmployees,',
     't.globalVars&&(t.globalVars.FindEmployeesCountRandom=h.length),_lastReport={ok:!0,profession:c,requested:d,poolSize:_.length,excluded:u.size,found:h}}',
     'i=_inst13(t,CFG.TEMP_ARRAY)',
-    'function _rt10(',
+    'function _rt11(',
+    # Game update 1.6: the recruitment table holds its Found numbers from just before a search
+    # (bulk.js keeps the hold from before the first search of a bulk run).
+    'function _tblHoldForSearch(){',
+    # The search is only run from the Find Employees sheet (auto-hire has its own), so a bulk
+    # pick never multiplies an auto-hire search.
+    'async EventFindEmployees_Event219_Act3(e,t){findEmployees(e)}',
+    # Its money goes to the game's finance ledger under Hiring (bulk.js records the extra searches).
+    'globalThis.financeRecord?.("staff",-o)',
     'function _inst13(',
 )
 

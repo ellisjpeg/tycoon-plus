@@ -8,15 +8,18 @@ function world(budget, pool) {
   const temp = { width: 0, height: 1, depth: 1, cells: [], setSize(w) { this.width = w; this.cells = []; }, setAt(v, i) { this.cells[i] = v; } };
   const g = { Budget: budget, FindEmployeesCountRandom: 0, FindEmployeesCharacters: 0, EmployeesProfession: "DESIGNERS", class: "FIND EMPLOYEES", EditorNotification: "OFF" };
   const runtime = { layout: { name: "FIND EMPLOYEES" }, globalVars: g, getInstanceByUid: () => null };
-  let left = pool, next = 1, calls = 0;
+  let left = pool, next = 1, calls = 0, holds = 0;
+  const book = [];
   const env = {
-    globalThis: { runtime },
+    globalThis: { runtime, financeRecord: (k, v) => book.push([k, v]) },
     _dtUi: { ensure: () => ({}), el: () => ({}), every: () => 0 },
     CFG: { TEMP_ARRAY: "temp" },
-    _rt10: () => runtime,
+    _rt11: () => runtime,
+    // The recruitment table's snapshot of Found (game update 1.6), taken by each game search.
+    _tblHoldForSearch: () => holds++,
     _inst13: () => temp,
     _lastReport: null,
-    _dtFindOne: () => {
+    __find: () => {
       calls++;
       const want = Math.max(0, Math.round(g.FindEmployeesCountRandom));
       const take = Math.min(want, left), found = [];
@@ -29,9 +32,10 @@ function world(budget, pool) {
       return rep;
     },
   };
-  const fn = new Function(...Object.keys(env), src + "\nreturn { bulk: _dtBulk, findEmployees };");
+  const one = "function _dtFindOne(e) { _tblHoldForSearch(); return __find(e); }\n";
+  const fn = new Function(...Object.keys(env), one + src + "\nreturn { bulk: _dtBulk, findEmployees };");
   const out = fn(...Object.values(env));
-  return { g, temp, runtime, calls: () => calls, ...out };
+  return { g, temp, runtime, calls: () => calls, holds: () => holds, book, ...out };
 }
 // The sheet's click: checks and takes one normal price, rolls one search, calls findEmployees.
 function click(w, tier) {
@@ -49,6 +53,8 @@ click(w, 1);
 assert.strictEqual(w.calls(), 1);
 assert.strictEqual(w.g.Budget, 1e9 - 45e4);
 assert.strictEqual(w.g.FindEmployeesCountRandom, 2);
+assert.strictEqual(w.holds(), 1);
+assert.deepStrictEqual(w.book, [], "x1 is the game's own search and price");
 
 // ×10 at Workify: ten searches, 10 × 675K in total, every candidate in the found list.
 w = world(1e9, 500);
@@ -61,6 +67,8 @@ assert.strictEqual(w.temp.width, rep.found.length);
 assert.ok(rep.found.length >= 10 && rep.found.length <= 20, "Workify finds 1-2 per search");
 assert.deepStrictEqual(w.temp.cells, rep.found.map((f) => f.id));
 assert.strictEqual(new Set(w.temp.cells).size, w.temp.cells.length, "no candidate twice");
+assert.strictEqual(w.holds(), 1, "the recruitment table keeps Found from before the first search");
+assert.deepStrictEqual(w.book, [["staff", -(6.75e6 - 45e4)]], "extra searches booked as Hiring in the game's ledger");
 
 // Every later search rolls the same agency's skill range.
 w = world(1e9, 500);
@@ -76,6 +84,7 @@ w.bulk.sel[0] = 20;
 const r2 = click(w, 0);
 assert.strictEqual(r2.found.length, 7);
 assert.strictEqual(w.g.Budget, 1e9 - w.calls() * 3e5, "only the searches run are paid for");
+assert.strictEqual(w.book.reduce((a, b) => a + b[1], 0), -(w.calls() * 3e5 - 2e5), "the ledger gets the refund too");
 assert.ok(w.calls() < 20);
 
 // Short of money: the count drops to the biggest step that fits (5 × 300K = 1.5M of 1.6M).
