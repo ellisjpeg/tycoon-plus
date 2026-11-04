@@ -5,8 +5,9 @@ files match exactly. Add a version here only after every mod's tests pass on it.
 """
 
 KNOWN = {
-    # sha256 of the original scripts/c3main.js and data.json inside www/assets.dat
-    ("feef387c8c0495a494ddeaf266abb03b437c3afd671a14fdaa3ba7a34ed244da",
-     "e4cbf8c1a07f196a41e26f51f15455f5c23128a2290f08467a399d18b44d2c8c"):
-        "Steam build of 16 October 2026 (Windows depot 2085661, manifest 6821940691056097977)",
+    # sha256 of the original scripts/c3main.js and data.json inside www/assets.dat.
+    # Steam updates the game on its own, so only the current build is listed.
+    ("a28de1fa0c3f81707d8c721581ee7c02433e3e3db5b6240d6caefdc13ba6298e",
+     "7ccc360d8f61ad92c8cd3ab57594de1b22e1f549aae744223a8524510893a3bb"):
+        "Steam build of 20 October 2026, game update 1.6 (Windows depot 2085661, manifest 631461069047824261)",
 }
