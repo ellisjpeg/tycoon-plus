@@ -19,17 +19,17 @@ DATA = PORT / 'game-files/data.json'
 REQUIRED_JS = (
     # Device columns; the day loop moves DayTotal on and calls the tick by name.
     'var Z13={CREATED:0,SOLDED:1,POP:2,COST:3,SELL:4,RATING:5,HYPE:6,RELEASE:7,NAME:8}',
-    'EventGameplay_Event448_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
+    'EventGameplay_Event449_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
     'function tickDeviceSales(e,t){',
     # Units sold are added to SOLDED; only released, POP > 0 rows sell.
-    'g.setAt(A+l,b,x,Z13.SOLDED)',
-    'const C=g.getAt(b,x,Z13.RELEASE);if(C<0||C>o)continue;let T=g.getAt(b,x,Z13.POP);if(T<=0)',
+    'm.setAt(A+l,b,x,Z13.SOLDED)',
+    'const C=m.getAt(b,x,Z13.RELEASE);if(C<0||C>o)continue;let T=m.getAt(b,x,Z13.POP);if(T<=0)',
     # Profit as the office shows it.
     'function _slotProfit(e){const t=e.sell-e.cost;return Math.round(e.solded*(t>0?t:0))}',
     # Restock gate: contract or self restock, minimum POP, price above unit cost + fee.
     'const n=t?Number(t.getAt(1,0,0)):NaN;d.contractEnd=isFinite(n)?n:-999}const b=a<=d.contractEnd,y=!b&&c.RESTOCK_SELF',
-    'if((b||y)&&r>=c.RESTOCK_MIN_POP){const a=t.getAt(n,o,Z13.COST),u=y?c.RESTOCK_FEE_SELF:c.RESTOCK_FEE,m=a>0?a*(1+u):0;if(m>0&&l>m)',
-    '_handleBatchSoldOut(n,g,b,x,o,N,T,O,M,a,m,k,U,W,B)',
+    'if((b||y)&&r>=c.RESTOCK_MIN_POP){const a=t.getAt(n,o,Z13.COST),u=y?c.RESTOCK_FEE_SELF:c.RESTOCK_FEE,g=a>0?a*(1+u):0;if(g>0&&l>g)',
+    '_handleBatchSoldOut(n,m,b,x,o,N,T,O,M,a,g,k,U,W,B)',
     'RESTOCK_SELF:!0',
     'RESTOCK_MIN_POP:3',
 )

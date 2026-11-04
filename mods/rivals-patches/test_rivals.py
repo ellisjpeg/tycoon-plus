@@ -58,8 +58,8 @@ class RivalsPatchTests(unittest.TestCase):
         self.assertEqual(patch.block(), core + ('\n;\n' + ui.read_text() if ui.exists() else ''))
 
     def test_game_and_module_names_checked(self):
-        for old in ('function tickDeviceSales(e,t){', 'EventGameplay_Event448_Act1(e,t){tickDeviceSales(',
-                    'if(T<=0){T<0&&g.setAt(0,b,x,Z13.POP)', 'function _readCompanies(){', 'function _companyName(e){'):
+        for old in ('function tickDeviceSales(e,t){', 'EventGameplay_Event449_Act1(e,t){tickDeviceSales(',
+                    'if(T<=0){T<0&&m.setAt(0,b,x,Z13.POP)', 'function _readCompanies(){', 'function _companyName(e){'):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source.replace(old, old[:-2] + '#!'), self.data)
         diff = self.source + '\n;\nvar _DT_DIFF_KEYS = [];\nfunction _dtResShipped() {}\n'

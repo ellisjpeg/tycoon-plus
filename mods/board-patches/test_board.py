@@ -53,8 +53,8 @@ class BoardTests(unittest.TestCase):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source, self.data.replace(old, old[:-1] + '2"'))
         # SOLDED written by the tick, the profit figure, the restock gate and the day call.
-        for old in ('g.setAt(A+l,b,x,Z13.SOLDED)', 'function _slotProfit(e){', 'if((b||y)&&r>=c.RESTOCK_MIN_POP)',
-                    'y=!b&&c.RESTOCK_SELF', 'EventGameplay_Event448_Act1(e,t){tickDeviceSales('):
+        for old in ('m.setAt(A+l,b,x,Z13.SOLDED)', 'function _slotProfit(e){', 'if((b||y)&&r>=c.RESTOCK_MIN_POP)',
+                    'y=!b&&c.RESTOCK_SELF', 'EventGameplay_Event449_Act1(e,t){tickDeviceSales('):
             with self.assertRaises(ValueError, msg=old):
                 patch.transform(self.source.replace(old, old[:-2] + '#!'), self.data)
 

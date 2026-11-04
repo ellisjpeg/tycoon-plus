@@ -20,10 +20,10 @@ FILES = ('rivals-core.js', 'rivals.js', 'rivals-ui.js')  # rivals-ui.js (the Riv
 REQUIRED_JS = (
     # Device columns and the day loop calling the tick by name.
     'var Z13={CREATED:0,SOLDED:1,POP:2,COST:3,SELL:4,RATING:5,HYPE:6,RELEASE:7,NAME:8}',
-    'EventGameplay_Event448_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
+    'EventGameplay_Event449_Act1(e,t){tickDeviceSales(e.globalVars.DayTotal,e)',
     'function tickDeviceSales(e,t){',
     # POP 0 is "not selling": the tick skips it (the effect never goes below 0).
-    'if(T<=0){T<0&&g.setAt(0,b,x,Z13.POP)',
+    'if(T<=0){T<0&&m.setAt(0,b,x,Z13.POP)',
     # Ratings reader: launches only while the company is active that year.
     'function _readCompanies(){',
     'function _companyName(e){',
